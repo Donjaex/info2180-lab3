@@ -70,12 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
 document.addEventListener("DOMContentLoaded", () => {
     const squares = document.querySelectorAll("#board .square");
     const statusDiv = document.getElementById("status");
-    let Player = "X";
-    const game_status = Array(9).fill(null); // Track the game state
+    let currentPlayer = "X"; // Start with player X
+    const gameStatus = Array(9).fill(null); // Track the game state
 
     // Winning combinations
     const winningCombinations = [
@@ -93,8 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function checkWinner() {
         for (const combination of winningCombinations) {
             const [a, b, c] = combination;
-            if (game_state[a] &&game_status[a] === game_status[b] && game_status[a] === game_status[c]) {
-                return game_status[a]; // Return the winner (X or O)
+            if (gameStatus[a] && gameStatus[a] === gameStatus[b] && gameStatus[a] === gameStatus[c]) {
+                return gameStatus[a]; // Return the winner (X or O)
             }
         }
         return null; // No winner yet
@@ -111,28 +110,30 @@ document.addEventListener("DOMContentLoaded", () => {
             square.classList.remove("hover");
         });
 
-        
+        // Event listener for click
         square.addEventListener("click", () => {
-            if (!game_status[index]) {
+            // Ensure the square is empty before proceeding
+            if (!gameStatus[index]) {
+                // Set the square's text to the current player (X or O)
+                square.textContent = currentPlayer;
+                // Add the appropriate class for styling
+                square.classList.add(currentPlayer);
+                
+                // Update game state
+                gameStatus[index] = currentPlayer;
 
-                square.textContent = Player;
-               
-                square.classList.add(Player);
-                
-                
-                game_status[index] = Player;
-
-                
+                // Check for a winner
                 const winner = checkWinner();
                 if (winner) {
-                    
+                    // Update the status message
                     statusDiv.innerHTML = `Congratulations! ${winner} is the Winner!`;
                     statusDiv.classList.add("you-won");
-                    
+                    // Disable further moves
                     squares.forEach(s => s.style.pointerEvents = 'none');
                 } else {
-                    
-                    Player = Player === "X" ? "O" : "X";
+                    // Toggle player
+                    currentPlayer = currentPlayer === "X" ? "O" : "X";
+                    statusDiv.innerHTML = `Current Player: ${currentPlayer}`; // Update the current player message
                 }
             }
         });
