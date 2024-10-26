@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
     const squares = document.querySelectorAll("#board .square");
     let currentPlayer = "X";
-    const gameState = Array(9).fill(null); // Track the game state
+    const game_status = Array(9).fill(null); // Track the game state
 
     squares.forEach((square, index) => {
         // Event listener for mouse over
@@ -52,18 +52,88 @@ document.addEventListener("DOMContentLoaded", () => {
         // Event listener for click
         square.addEventListener("click", () => {
             // Ensure the square is empty before proceeding
-            if (!gameState[index]) {
+            if (!game_status[index]) {
                 // Set the square's text to the current player (X or O)
-                square.textContent = currentPlayer;
+                square.textContent = Player;
                 
                 // Add the appropriate class for styling
-                square.classList.add(currentPlayer);
+                square.classList.add(Player);
 
                 // Update game state
-                gameState[index] = currentPlayer;
+                game_status[index] = Player;
 
                 // Toggle player
-                currentPlayer = currentPlayer === "X" ? "O" : "X";
+                Player = Player === "X" ? "O" : "X";
+            }
+        });
+    });
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const squares = document.querySelectorAll("#board .square");
+    const statusDiv = document.getElementById("status");
+    let Player = "X";
+    const game_status = Array(9).fill(null); // Track the game state
+
+    // Winning combinations
+    const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+
+    // Function to check for a winner
+    function checkWinner() {
+        for (const combination of winningCombinations) {
+            const [a, b, c] = combination;
+            if (game_state[a] &&game_status[a] === game_status[b] && game_status[a] === game_status[c]) {
+                return game_status[a]; // Return the winner (X or O)
+            }
+        }
+        return null; // No winner yet
+    }
+
+    squares.forEach((square, index) => {
+        // Event listener for mouse over
+        square.addEventListener("mouseover", () => {
+            square.classList.add("hover");
+        });
+
+        // Event listener for mouse out
+        square.addEventListener("mouseout", () => {
+            square.classList.remove("hover");
+        });
+
+        
+        square.addEventListener("click", () => {
+            if (!game_status[index]) {
+
+                square.textContent = Player;
+               
+                square.classList.add(Player);
+                
+                
+                game_status[index] = Player;
+
+                
+                const winner = checkWinner();
+                if (winner) {
+                    
+                    statusDiv.innerHTML = `Congratulations! ${winner} is the Winner!`;
+                    statusDiv.classList.add("you-won");
+                    
+                    squares.forEach(s => s.style.pointerEvents = 'none');
+                } else {
+                    
+                    Player = Player === "X" ? "O" : "X";
+                }
             }
         });
     });
