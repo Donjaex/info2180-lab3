@@ -69,12 +69,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
 document.addEventListener("DOMContentLoaded", () => {
-    const squares = document.querySelectorAll("#board .square");
-    const statusDiv = document.getElementById("status");
+    const squares = document.querySelectorAll("#board div"); // Select all square elements
+    const statusDiv = document.getElementById("status"); // Select status display
+    const restartButton = document.querySelector(".btn"); // Select restart button
     let currentPlayer = "X"; // Start with player X
-    const gameStatus = Array(9).fill(null); // Track the game state
+    const gameStatus = Array(9).fill(null); // Track game state
 
     // Winning combinations
     const winningCombinations = [
@@ -99,6 +99,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return null; // No winner yet
     }
 
+    // Function to restart the game
+    function restartGame() {
+        gameStatus.fill(null); // Reset game status
+        currentPlayer = "X"; // Reset current player
+        statusDiv.innerHTML = `Move your mouse over a square and click to play an X or an O.`; // Reset status message
+
+        squares.forEach(square => {
+            square.textContent = ""; // Clear the square text
+            square.classList.remove("X", "O", "hover"); // Remove classes
+            square.style.pointerEvents = 'auto'; // Enable square clicks
+        });
+    }
+
+    // Event listeners for squares
     squares.forEach((square, index) => {
         // Event listener for mouse over
         square.addEventListener("mouseover", () => {
@@ -114,28 +128,22 @@ document.addEventListener("DOMContentLoaded", () => {
         square.addEventListener("click", () => {
             // Ensure the square is empty before proceeding
             if (!gameStatus[index]) {
-                // Set the square's text to the current player (X or O)
-                square.textContent = currentPlayer;
-                // Add the appropriate class for styling
-                square.classList.add(currentPlayer);
-                
-                // Update game state
-                gameStatus[index] = currentPlayer;
+                square.textContent = currentPlayer; // Set the square's text to the current player (X or O)
+                square.classList.add(currentPlayer); // Add class for styling
+                gameStatus[index] = currentPlayer; // Update game state
 
-                // Check for a winner
-                const winner = checkWinner();
+                const winner = checkWinner(); // Check for a winner
                 if (winner) {
-                    // Update the status message
-                    statusDiv.innerHTML = `Congratulations! ${winner} is the Winner!`;
-                    statusDiv.classList.add("you-won");
-                    // Disable further moves
-                    squares.forEach(s => s.style.pointerEvents = 'none');
+                    statusDiv.innerHTML = `Congratulations! ${winner} is the Winner!`; // Update status message
+                    squares.forEach(s => s.style.pointerEvents = 'none'); // Disable further moves
                 } else {
-                    // Toggle player
-                    currentPlayer = currentPlayer === "X" ? "O" : "X";
-                    statusDiv.innerHTML = `Current Player: ${currentPlayer}`; // Update the current player message
+                    currentPlayer = currentPlayer === "X" ? "O" : "X"; // Toggle player
+                    statusDiv.innerHTML = `Current Player: ${currentPlayer}`; // Update current player message
                 }
             }
         });
     });
+
+    // Attach event listener to the restart button
+    restartButton.addEventListener("click", restartGame);
 });
